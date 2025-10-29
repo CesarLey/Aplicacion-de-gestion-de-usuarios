@@ -37,6 +37,7 @@ dependencies:
   supabase_flutter: ^2.0.0
   image_picker: ^1.0.5
   flutter_dotenv: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +49,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+  # Tools to generate launcher icons and native splash screens
+  flutter_native_splash: ^2.2.20
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -90,3 +94,25 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  # Assets used for app icon and splash generation
+  assets:
+    - assets/branding/icon.png
+    - assets/branding/splash.png
+
+# Configuration for flutter_launcher_icons (generates Android & iOS icons)
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/branding/icon.png"
+  remove_alpha_ios: false
+
+# Configuration for flutter_native_splash (generates native launch screens)
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/branding/splash.png
+  android: true
+  ios: true
+  web: false
+  android_gravity: center
+  ios_content_mode: center
