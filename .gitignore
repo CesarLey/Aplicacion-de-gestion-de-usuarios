@@ -53,3 +53,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Ignore the nested practice project directory (not a tracked submodule)
+Practica-010-Smart-Task-Manager/
