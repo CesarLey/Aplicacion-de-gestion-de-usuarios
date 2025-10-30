@@ -23,7 +23,12 @@ class _AccountPageState extends State<AccountPage> {
       _loading = true;
     });
     try {
-      final userId = supabase.auth.currentSession!.user.id;
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        if (mounted) context.showSnackBar('No hay usuario autenticado', isError: true);
+        return;
+      }
+      final userId = user.id;
       final data =
           await supabase.from('profiles').select().eq('id', userId).single();
       _usernameController.text = (data['username'] ?? '') as String;
@@ -52,8 +57,12 @@ class _AccountPageState extends State<AccountPage> {
     final userName = _usernameController.text.trim();
     final website = _websiteController.text.trim();
     final user = supabase.auth.currentUser;
+    if (user == null) {
+      if (mounted) context.showSnackBar('No hay usuario autenticado', isError: true);
+      return;
+    }
     final updates = {
-      'id': user!.id,
+      'id': user.id,
       'username': userName,
       'website': website,
       'avatar_url': _avatarUrl,
@@ -80,7 +89,12 @@ class _AccountPageState extends State<AccountPage> {
   /// Called when image has been uploaded to Supabase storage from within Avatar widget
   Future<void> _onAvatarUpload(String imageUrl) async {
     try {
-      final userId = supabase.auth.currentUser!.id;
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        if (mounted) context.showSnackBar('No hay usuario autenticado', isError: true);
+        return;
+      }
+      final userId = user.id;
       await supabase.from('profiles').upsert({
         'id': userId,
         'avatar_url': imageUrl,

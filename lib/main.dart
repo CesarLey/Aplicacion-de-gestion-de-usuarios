@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_quickstart/pages/account_page.dart';
-import 'package:supabase_quickstart/pages/login_page.dart';
+import 'package:supabase_quickstart/pages/tasks_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,9 +58,78 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: supabase.auth.currentSession == null
-          ? const LoginPage()
-          : const AccountPage(),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late int _selectedIndex;
+  StreamSubscription<dynamic>? _authSub;
+
+  final List<Widget> _pages = [
+    const AccountPage(),
+    const TasksPage(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Start on Login if not authenticated, otherwise show Tasks.
+    _selectedIndex = supabase.auth.currentSession == null ? 0 : 1;
+
+    // Listen to auth changes so we can switch tabs automatically.
+    try {
+      _authSub = supabase.auth.onAuthStateChange.listen((event) {
+        final session = supabase.auth.currentSession;
+        if (session != null && mounted) {
+          setState(() => _selectedIndex = 1);
+        } else if (session == null && mounted) {
+          setState(() => _selectedIndex = 0);
+        }
+      });
+    } catch (_) {
+      // If the auth stream API is not available for some reason, ignore.
+    }
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(child: _pages[_selectedIndex]),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Tareas',
+          ),
+        ],
+      ),
     );
   }
 }
